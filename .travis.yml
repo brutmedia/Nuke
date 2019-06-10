@@ -1,5 +1,6 @@
 language: objective-c
 os: osx
+osx_image: xcode10.2
 
 git:
   depth: 1
@@ -7,6 +8,7 @@ git:
 env:
   global:
     - SCHEME="Nuke"
+    - FRAMEWORK_NAME=Nuke
 
 matrix:
   include:
@@ -56,3 +58,15 @@ script:
     else
       xcodebuild build -scheme "$SCHEME" -destination "$DESTINATION" -configuration Debug SWIFT_VERSION="$SWIFT_VERSION" | xcpretty;
     fi
+
+before_deploy:
+  - carthage build --no-skip-current
+  - carthage archive $FRAMEWORK_NAME
+deploy:
+  provider: releases
+  api_key:
+    secure: Z7SxSfUyLlvcTZtIDbcht6AaXuc9/aaX9XIjpXwVDunZ0zdJ1f9KSoL+O4UbfiuGfivJJ9gKkXcE3LnmjvvaMYs1RMCNLPrWEA0Xyj36mUzoShrIHXlHgq7orDe21TSV6aGmYboZoiz7DnwTnmQVreRL3rp6LgbpRcX+KV0ilyP4hZOP8X2/NzBU+/501eKh2W67ei3y08uFtr0xTD2xBhO6RAZWLyuEOw0FIowqOtUh1ReGDLx37qaOGGVE3JF8zYG7doqbYnn6f2Ul44NT9L2g/gfWhhx5lcWfc3eua1yNBuF9fEjYiLenEaX5YBx0uDP3vxID0xabu55WdAg9INYEsKU3eSxujz37+y9ZHR0wf9BEI/g/TWXLhyPcjBD2WHJyv03of8Bwao0UQzzDYEqJlVOnzQEXhJnVwHXP+Kh8udTVAhvvQbhBh+oO6Ym1FCb3Ovc3mPN7/vN/gYWmnq5NyBH4i+3PtR+0Gon6cVSxpXp5oF2Ptz7a0a5QQI+wxAyz6GHv//OpoUeKqEo2phteI4eifIm3+q/g6eyO90J0FPRsk3yTOPKAC4D1vYmhvBvAakZxd015qR6ZOjdMVY0KkQBhfyl2HVaTP4ombkQ9CV738LmmnmA3kDqpfoiuzEUcmGlV0tx4jnkA2WSVPEt3roeI9LOdROX/ISEExNU=
+  file: "$FRAMEWORK_NAME.framework.zip"
+  on:
+    repo: brutmedia/Nuke
+    tags: true
